@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+import os
+import subprocess
+from subprocess import PIPE
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import argparse
+from contextlib import nullcontext
+
+CONFIG = """
+daemon off;
+worker_processes 1;
+error_log stderr;
+
+pid off;
+events {}
+
+error_log stderr;
+
+http {
+    access_log /dev/stdout;
+    server {
+        listen 0.0.0.0:8888;
+
+        location / {
+            return 200 $http_user_agent;
+        }
+    }
+}
+"""
+
+def main():
+    # formatter_class because breaking lines caused the links in help to break
+    parser = argparse.ArgumentParser(
+            prog='inginx', 
+            description='Spawn single use nginx instances', 
+            formatter_class=argparse.RawTextHelpFormatter)
+
+    # TODO none of this is implemented
+    parser.add_argument("-e", "--executable", metavar="executable", help="Which nginx executable to use. By default will try freenginx, nginx, in this order")
+    parser.add_argument("-p", "--prefix", metavar="directory", help="What directory to use as nginx prefix. By default will use tempfile.TemporaryDirectory")
+    parser.add_argument("-s", "--serve", metavar="directory", help="Use to setup a filesystem directory. Will be pasted directly into the root directive https://freenginx.org/en/docs/http/ngx_http_core_module.html#root")
+    parser.add_argument("-r", "--reverse", metavar="remote", help="Use to setup a reverse proxy. Will be pasted directly into the proxy_pass directive https://freenginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass")
+    parser.add_argument("-l", "--listen", metavar="address[:port]", default="0.0.0.0:8888", help="What address to listen to. Will be pasted directly into the listen directive https://freenginx.org/en/docs/http/ngx_http_core_module.html#listen")
+    parser.add_argument("-d", "--dry", action="store_true", help="Construct the config, print it, and exit.")
+    parser.add_argument("-t", "--test", action="store_true", help="Construct the config, run nginx test on it and exit")
+
+    args = parser.parse_args()
+
+    with (TemporaryDirectory(delete=False) if not args.prefix else nullcontext(args.prefix)) as d:
+        d = Path(d).absolute()
+        print(f"Running nginx in {d}")
+        d.mkdir(parents=True, exist_ok=True)
+
+        conf_path = d / "nginx.conf"
+        with open(conf_path, "w") as f:
+            f.write(CONFIG)
+        
+        nginx = subprocess.call(["nginx", "-c", str(conf_path), "-p", str(d)])
+
+if __name__ == "__main__":
+    main()
