@@ -33,8 +33,9 @@ def main():
     # formatter_class because breaking lines caused the links in help to break
     parser = argparse.ArgumentParser(
             prog='inginx', 
-            description='Spawn single use nginx instances', 
-            formatter_class=argparse.RawTextHelpFormatter)
+            description='Spawn single use nginx instances. Default behavior is the same as --serve $(pwd)', 
+            formatter_class=argparse.RawTextHelpFormatter
+            )
 
     # TODO none of this is implemented
     parser.add_argument("-e", "--executable", metavar="executable", help="Which nginx executable to use. By default will try freenginx, nginx, in this order")
