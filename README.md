@@ -1,10 +1,15 @@
 # In🍸x 
 
+> ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️
+> None of this works yet!
+> ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️
+
 Nginx is a really powerful software, but it requires non-trivial configuration and its own working directory. Command-line configuration is possible but verbose.
 
 This utility creates a temporary working directory and assembles an Nginx configuration optimized for common use cases.
 
 > The name “inginx” is derived from “instant Nginx” (in🍸x)
+
 
 # Installation
 
