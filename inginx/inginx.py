@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -10,21 +11,20 @@ from tempfile import TemporaryDirectory
 CONFIG = """
 daemon off;
 worker_processes 1;
-error_log stderr;
+error_log /dev/stderr;
 
-pid off;
+pid pid;
 events {}
 
-error_log stderr;
-
 http {
+    error_log stderr;
     access_log /dev/stdout;
     
     $SERVER
 }
 """
 
-SERVER_DEFAULT = """
+SERVER_ECHO = """
 server {
     listen $LISTEN;
 
@@ -79,6 +79,7 @@ def main():
 
     parser.add_argument("-s", "--serve", metavar="directory", help="Use to setup a filesystem directory. Will be pasted directly into the root directive https://freenginx.org/en/docs/http/ngx_http_core_module.html#root")
     parser.add_argument("-r", "--reverse", metavar="remote", help="Use to setup a reverse proxy. Will be pasted directly into the proxy_pass directive https://freenginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass")
+    parser.add_argument("-c", "--echo", action="store_true", help="Use to setup an echo http server")
     parser.add_argument("-l", "--listen", metavar="address[:port]", default="0.0.0.0:8888", help="What address to listen to. Will be pasted directly into the listen directive https://freenginx.org/en/docs/http/ngx_http_core_module.html#listen")
 
     parser.add_argument("-d", "--dry", action="store_true", help="Construct the config, print it, and exit.")
@@ -95,20 +96,24 @@ def main():
 
         try:
             d = Path(d).absolute()
-            print(f"Running {executable} in {d}", file=sys.stderr)
             d.mkdir(parents=True, exist_ok=True)
 
             config_content = CONFIG
 
-            if args.serve:
-                config_content = config_content.replace("$SERVER", SERVER_SERVE_DIR)
-                serve = str(Path(args.serve).absolute())
-                config_content = config_content.replace("$ROOT", args.serve)
-            elif args.reverse:
+            action = ""
+
+            if args.reverse:
                 config_content = config_content.replace("$SERVER", SERVER_PROXY_PASS)
                 config_content = config_content.replace("$UPSTREAM", args.reverse)
+                action = f"reverse proxying {args.reverse}"
+            if args.echo:
+                config_content = config_content.replace("$SERVER", SERVER_ECHO)
+                action = f"http echoing"
             else:
-                config_content = config_content.replace("$SERVER", SERVER_DEFAULT)
+                config_content = config_content.replace("$SERVER", SERVER_SERVE_DIR)
+                serve = str(Path(args.serve or os.getcwd()).absolute())
+                config_content = config_content.replace("$ROOT", serve)
+                action = f"serving files {serve} directory"
 
             config_content = config_content.replace("$LISTEN", args.listen)
 
@@ -125,6 +130,8 @@ def main():
             if args.test:
                 nginx_args.append("-t")
 
+            print(f"{' '.join(nginx_args)}", file=sys.stderr)
+            print(action)
             nginx = subprocess.call(nginx_args)
         except KeyboardInterrupt:
             pass
