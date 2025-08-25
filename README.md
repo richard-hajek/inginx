@@ -110,4 +110,4 @@ nginx -p $(realpath .) -c $(realpath ./nginx.conf)
 
 # freenginx vs nginx
 
-This software is officially supports and recommends `freenginx`
+This software officially supports and recommends `freenginx`
