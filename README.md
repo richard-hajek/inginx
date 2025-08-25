@@ -1,9 +1,4 @@
-# In🍸x 
-
-> [!WARNING]
-> 
-> None of this works yet!
-> Consider this a plan
+# Inginx 
 
 Nginx is a really powerful software, but it requires non-trivial configuration and its own working directory. Command-line configuration is possible but verbose.
 
@@ -14,20 +9,40 @@ This utility creates a temporary working directory and assembles an Nginx config
 
 # Installation
 
-## Manual
-
-TODO: Just copy the file to $PATH
-
-## pip
-
-TOOD:
-I dont think pip no longer supports user wide installations no?
+Ideal solution, but needs uvx, or pipx pre-installed
 
 ## pipx/uvx/....
 
-TODO:
+```
+uvx inginx --help
+```
 
-well i have to upload it first
+```
+pipx install inginx
+inginx --help
+```
+
+## pip
+
+```
+pip install --user inginx --break-system-packages
+```
+
+> [!WARNING]
+> This is generally not recommended. It works-ish in this case because inginx does not have any dependencies
+
+
+## Manual
+
+```
+wget https://raw.githubusercontent.com/richard-hajek/inginx/refs/heads/main/inginx/inginx.py -O ~/.local/bin
+chmod +x ~/.local/bin/inginx
+```
+
+> [!WARNING]
+> Check that ~/.local/bin is in your path by doing echo $PATH and checking, with your eyes, if '.local/bin' is there
+> If not, good luck, have fun, see https://askubuntu.com/questions/440691/add-a-binary-to-my-path
+
 
 # Usage
 
