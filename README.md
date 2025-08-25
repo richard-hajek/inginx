@@ -1,8 +1,10 @@
-# Inginx 
+<p align="center">
+  <img src="https://github.com/richard-hajek/inginx/blob/main/docs/inginx.png" />
+</p>
 
 Nginx is a really powerful software, but it requires non-trivial configuration and its own working directory. Command-line configuration is possible but verbose.
 
-This utility creates a temporary working directory and assembles an Nginx configuration optimized for common use cases.
+**inginx** creates a temporary working directory and assembles an nginx configuration optimized for common use cases.
 
 > [!TIP]
 > The name “inginx” is derived from “instant nginx”
@@ -103,5 +105,9 @@ and then make any changes you want to the generated nginx.conf
 And run your nginx with
 
 ```
-freenginx -p $(realpath .) -c $(realpath ./nginx.conf)
+nginx -p $(realpath .) -c $(realpath ./nginx.conf)
 ```
+
+# freenginx vs nginx
+
+This software is officially supports and recommends `freenginx`
