@@ -4,12 +4,54 @@ Nginx is a really powerful software, but it requires non-trivial configuration a
 
 This utility creates a temporary working directory and assembles an Nginx configuration optimized for common use cases.
 
-> The name “inginx” is derived from “instant Nginx” (in🍸x)
+> The name “inginx” is derived from “instant Nginx”
 
+## Examples
+
+### Serve file system
+
+Serve a directory `./dir` on `8787`
+
+```
+inginx --serve ./dir --listen 0.0.0.0:8787
+```
+
+Output:
+
+```
+Running /usr/bin/freenginx in /tmp/tmpu8151mtc
+127.0.0.1 - - [25/Aug/2025:11:18:50 +0200] "GET / HTTP/1.1" 200 263 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
+....
+```
+
+### Reverse proxy
+
+Start a reverse proxy up to `https://echo.free.beeceptor.com` on `8080`
+
+```
+inginx --reverse https://echo.free.beeceptor.com --listen 0.0.0.0:8080
+```
+
+Output:
+```
+Running /usr/bin/freenginx in /tmp/tmpo66xmvm_
+127.0.0.1 - - [25/Aug/2025:11:21:03 +0200] "GET / HTTP/1.1" 200 844 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
+...
+```
+
+## Common Flags
+
+- `--serve <directory>` - Serve a local filesystem directory
+
+- `--reverse <remote>` - Set up a reverse proxy
+
+- `--listen <address[:port]>` - Tell Nginx what address/port to use
 
 # Installation
 
-## pipx/uvx/....
+This is a self-contained script that has no dependencies. It is aiming to work on as old Python as 3.7.
+
+## Managed installation (uvx, pipx)
 
 Ideal solution, but needs uvx, or pipx pre-installed
 This is the most painless solution
@@ -30,7 +72,7 @@ pip install --user inginx --break-system-packages
 ```
 
 > [!WARNING]
-> This is generally not recommended. It works-ish in this case because inginx does not have any dependencies
+> This is generally not recommended. It will work and not break anything in this case because inginx does not have any dependencies.
 
 
 ## Manual
@@ -42,28 +84,23 @@ chmod +x ~/.local/bin/inginx
 
 > [!WARNING]
 > Check that ~/.local/bin is in your path by doing echo $PATH and checking, with your eyes, if '.local/bin' is there
-> If not, good luck, have fun, see https://askubuntu.com/questions/440691/add-a-binary-to-my-path
+> If not, good luck, have fun, see https://askubuntu.com/questions/440691/add-a-binary-to-my-path for detailed instructions how to manage your $PATH
 
 
-# Usage
+# Advanced configuration
+
+This tool is not indended for advanced configuration. It will however provide you with a good starting point. If you want to further customize the nginx instance, do
 
 ```
-usage: inginx [-h] [-e executable] [-p directory] [-s directory] [-r remote]
-              [-l address[:port]] [-d] [-t]
+mkdir ./prefix
+cd ./prefix
+inginx <your configuration> --dry > nginx.conf
+```
 
-Spawn single use nginx instances
+and then make any changes you want to the generated nginx.conf
 
-options:
-  -h, --help            show this help message and exit
-  -e, --executable executable
-                        Which nginx executable to use. By default will try freenginx, nginx, in this order
-  -p, --prefix directory
-                        What directory to use as nginx prefix. By default will use tempfile.TemporaryDirectory
-  -s, --serve directory
-                        Use to setup a filesystem directory. Will be pasted directly into the root directive https://freenginx.org/en/docs/http/ngx_http_core_module.html#root
-  -r, --reverse remote  Use to setup a reverse proxy. Will be pasted directly into the proxy_pass directive https://freenginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass
-  -l, --listen address[:port]
-                        What address to listen to. Will be pasted directly into the listen directive https://freenginx.org/en/docs/http/ngx_http_core_module.html#listen
-  -d, --dry             Construct the config, print it, and exit.
-  -t, --test            Construct the config, run nginx test on it and exit
+And run your nginx with
+
+```
+freenginx -p $(realpath .) -c $(realpath ./nginx.conf)
 ```

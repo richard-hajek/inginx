@@ -2,6 +2,7 @@
 import argparse
 import shutil
 import subprocess
+import sys
 from contextlib import nullcontext
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -56,7 +57,7 @@ server {
 """
 
 def find_default_executable():
-    for candidate in ("freenignx", "nginx"):
+    for candidate in ("freenginx", "nginx"):
         path = shutil.which(candidate)
         if path:
             return path
@@ -91,37 +92,42 @@ def main():
     executable = args.executable or find_default_executable()
 
     with (TemporaryDirectory(delete=False) if not args.prefix else nullcontext(args.prefix)) as d:
-        d = Path(d).absolute()
-        print(f"Running {executable} in {d}")
-        d.mkdir(parents=True, exist_ok=True)
 
-        config_content = CONFIG
+        try:
+            d = Path(d).absolute()
+            print(f"Running {executable} in {d}", file=sys.stderr)
+            d.mkdir(parents=True, exist_ok=True)
 
-        if args.serve:
-            config_content = config_content.replace("$SERVER", SERVER_SERVE_DIR)
-            config_content = config_content.replace("$ROOT", args.serve)
-        elif args.reverse:
-            config_content = config_content.replace("$SERVER", SERVER_PROXY_PASS)
-            config_content = config_content.replace("$UPSTREAM", args.reverse)
-        else:
-            config_content = config_content.replace("$SERVER", SERVER_DEFAULT)
+            config_content = CONFIG
 
-        config_content = config_content.replace("$LISTEN", args.listen)
+            if args.serve:
+                config_content = config_content.replace("$SERVER", SERVER_SERVE_DIR)
+                serve = str(Path(args.serve).absolute())
+                config_content = config_content.replace("$ROOT", args.serve)
+            elif args.reverse:
+                config_content = config_content.replace("$SERVER", SERVER_PROXY_PASS)
+                config_content = config_content.replace("$UPSTREAM", args.reverse)
+            else:
+                config_content = config_content.replace("$SERVER", SERVER_DEFAULT)
 
-        conf_path = d / "nginx.conf"
-        with open(conf_path, "w") as f:
-            f.write(config_content)
+            config_content = config_content.replace("$LISTEN", args.listen)
 
-        if args.dry:
-            print(config_content)
-            return
+            conf_path = d / "nginx.conf"
+            with open(conf_path, "w") as f:
+                f.write(config_content)
 
-        nginx_args = [executable, "-c", str(conf_path), "-p", str(d)]
+            if args.dry:
+                print(config_content)
+                return
 
-        if args.test:
-            nginx_args.append("-t")
+            nginx_args = [executable, "-c", str(conf_path), "-p", str(d)]
 
-        nginx = subprocess.call(nginx_args)
+            if args.test:
+                nginx_args.append("-t")
+
+            nginx = subprocess.call(nginx_args)
+        except KeyboardInterrupt:
+            pass
 
 if __name__ == "__main__":
     main()
