@@ -9,9 +9,10 @@ This utility creates a temporary working directory and assembles an Nginx config
 
 # Installation
 
-Ideal solution, but needs uvx, or pipx pre-installed
-
 ## pipx/uvx/....
+
+Ideal solution, but needs uvx, or pipx pre-installed
+This is the most painless solution
 
 ```
 uvx inginx --help
