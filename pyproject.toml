@@ -1,6 +1,6 @@
 [project]
 name = "inginx"
-version = "0.1.1"
+version = "0.1.2"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-inginx = "inginx:main"
+inginx = "inginx.inginx:main"
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
