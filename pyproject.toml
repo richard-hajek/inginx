@@ -1,6 +1,6 @@
 [project]
 name = "inginx"
-version = "0.3.13"
+version = "0.3.15"
 description = "Add your description here"
 readme = "README.md"
 authors = [
