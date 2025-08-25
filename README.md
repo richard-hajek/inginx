@@ -2,7 +2,7 @@
   <img src="https://github.com/richard-hajek/inginx/blob/main/docs/inginx.png" />
 </p>
 
-Nginx is a really powerful software, but it requires non-trivial configuration and its own working directory. Command-line configuration is possible but verbose.
+nginx is a really powerful software, but it requires non-trivial configuration and its own working directory. Command-line configuration is possible but verbose.
 
 **inginx** creates a temporary working directory and assembles an nginx configuration optimized for common use cases.
 
@@ -52,7 +52,7 @@ Running /usr/bin/freenginx in /tmp/tmpo66xmvm_
 
 # Installation
 
-This is a self-contained script that has no dependencies. It is aiming to work on as old Python as 3.7.
+This is a self-contained script that has no dependencies, besides nginx itself. It is aiming to work on as old Python as 3.7.
 
 ## Managed installation (uvx, pipx)
 
@@ -108,6 +108,6 @@ And run your nginx with
 nginx -p $(realpath .) -c $(realpath ./nginx.conf)
 ```
 
-# freenginx vs nginx
+# nginx binary
 
-This software officially supports and recommends `freenginx`
+This software officially supports and recommends `freenginx`. It was built and tested for `freenginx/1.29.0`
