@@ -39,6 +39,7 @@ server {
     listen $LISTEN;
 
     location / {
+        include  /etc/nginx/mime.types;
         autoindex on;
         root $ROOT;
     }
@@ -131,7 +132,7 @@ def main():
                 nginx_args.append("-t")
 
             print(f"{' '.join(nginx_args)}", file=sys.stderr)
-            print(action)
+            print(action + f" listening on http://{args.listen}")
             nginx = subprocess.call(nginx_args)
         except KeyboardInterrupt:
             pass
